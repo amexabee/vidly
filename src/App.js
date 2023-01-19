@@ -1,4 +1,3 @@
-import './App.css';
 import {
   Route,
   createBrowserRouter,
@@ -11,12 +10,15 @@ import Customers from './components/customers';
 import Rentals from './components/rentals';
 import NotFound from './components/notFound';
 import MovieForm from './components/movieForm';
+import Login from './components/login';
+import './App.css';
 
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path="/" element={<NavBar />}>
       <Route path="customers" element={<Customers />} />
       <Route path="rentals" element={<Rentals />} />
+      <Route path="login" element={<Login />} />
       <Route path=":id" element={<MovieForm />} />
       <Route index element={<Movies />} />
 
