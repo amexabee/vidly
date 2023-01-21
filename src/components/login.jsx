@@ -1,10 +1,18 @@
 import { useState } from 'react';
 
 const LoginForm = () => {
-  const [username, setUsername] = useState('');
+  const [account, setAccount] = useState({
+    account: { username: '', password: '' },
+  });
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log('submitted');
+  };
+
+  const handleChange = (e) => {
+    const newAccount = { ...account };
+    newAccount.username = e.target.value;
+    setAccount(newAccount);
   };
 
   return (
@@ -17,8 +25,8 @@ const LoginForm = () => {
             type="text"
             className="form-control"
             id="username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            value={account.username}
+            onChange={handleChange}
           />
         </div>
         <div className="form-group">
