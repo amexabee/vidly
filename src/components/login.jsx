@@ -1,10 +1,17 @@
 import { Component } from 'react';
+import Input from './common/input';
 
 class LoginForm extends Component {
-  state = { account: { username: '', password: '' } };
+  state = { account: { username: '', password: '' }, errors: {} };
+
   handleSubmit = (e) => {
     e.preventDefault();
+
+    const errors = this.validate();
+    this.setState({ errors });
   };
+
+  validate = () => ({ username: 'Username is required' });
 
   handleChange = ({ target: input }) => {
     const account = { ...this.state.account };
@@ -13,31 +20,23 @@ class LoginForm extends Component {
   };
 
   render() {
-    const { account } = this.state;
+    const { username, password } = this.state.account;
     return (
       <div>
         <h1>Login</h1>
         <form onSubmit={this.handleSubmit}>
-          <div className="form-group">
-            <label htmlFor="username">Username</label>
-            <input
-              value={account.username}
-              onChange={this.handleChange}
-              type="text"
-              className="form-control"
-              id="username"
-            />
-          </div>
-          <div className="form-group">
-            <label htmlFor="password">Password</label>
-            <input
-              type="text"
-              className="form-control"
-              id="password"
-              value={account.password}
-              onChange={this.handleChange}
-            />
-          </div>
+          <Input
+            value={username}
+            name="username"
+            label="Username"
+            onChange={this.handleChange}
+          />
+          <Input
+            value={password}
+            name="password"
+            label="Password"
+            onChange={this.handleChange}
+          />
           <button className="btn btn-primary mt-2">Login</button>
         </form>
       </div>
