@@ -1,9 +1,9 @@
 import { Component } from 'react';
-import Joi, { options } from 'joi-browser';
+import Joi from 'joi-browser';
 import Input from './common/input';
 
 class LoginForm extends Component {
-  state = { account: { username: '', password: '' }, errors: {} };
+  state = { data: { username: '', password: '' }, errors: {} };
 
   schema = {
     username: Joi.string().required().label('Username'),
@@ -19,18 +19,21 @@ class LoginForm extends Component {
 
   validate = () => {
     const options = { abortEarly: false };
-    const { error } = Joi.validate(this.state.account, this.schema, options);
+    const { error } = Joi.validate(this.state.data, this.schema, options);
+
+    if (!error) return null;
 
     const errors = {};
-    if (error)
-      for (let item of error.details) errors[item.path[0]] = item.message;
+    for (let item of error.details) errors[item.path[0]] = item.message;
 
     return errors;
   };
 
   validateProperty = ({ id, value }) => {
-    if (id === 'username') if (!value.trim()) return 'Username is required';
-    if (id === 'password') if (!value.trim()) return 'Password is required';
+    const data = { [id]: value };
+    const schema = { [id]: this.schema[id] };
+    const { error } = Joi.validate(data, schema);
+    return error ? error.details[0].message : null;
   };
 
   handleChange = ({ target: input }) => {
@@ -39,32 +42,34 @@ class LoginForm extends Component {
     if (errorMessage) errors[input.id] = errorMessage;
     else delete errors[input.id];
 
-    const account = { ...this.state.account };
-    account[input.id] = input.value;
-    this.setState({ account, errors });
+    const data = { ...this.state.data };
+    data[input.id] = input.value;
+    this.setState({ data, errors });
   };
 
   render() {
-    const { account, errors } = this.state;
+    const { data, errors } = this.state;
     return (
       <div>
         <h1>Login</h1>
         <form onSubmit={this.handleSubmit}>
           <Input
-            value={account.username}
+            value={data.username}
             error={errors.username}
             name="username"
             label="Username"
             onChange={this.handleChange}
           />
           <Input
-            value={account.password}
+            value={data.password}
             error={errors.password}
             name="password"
             label="Password"
             onChange={this.handleChange}
           />
-          <button className="btn btn-primary mt-2">Login</button>
+          <button disabled={this.validate()} className="btn btn-primary mt-2">
+            Login
+          </button>
         </form>
       </div>
     );
@@ -76,8 +81,8 @@ FOR SOME STRANGE REASON WHEN I USE THE FUNCTIONAL COMPONENT BELOW IT IS WARNING 
 UNCONTROLLED COMPONENT TO A CONTROLLED ONE EVEN THOUGH I USED USE STATE AND REFER TO IT TO MAKE IT CONTROLLED 
 
 const LoginForm = () => {
-  const [account, setAccount] = useState({
-    account: { username: '', password: '' },
+  const [data, setdata] = useState({
+    data: { username: '', password: '' },
   });
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -85,9 +90,9 @@ const LoginForm = () => {
   };
 
   const handleChange = ({ target: input }) => {
-    const newAccount = { ...account };
-    newAccount[input.id] = input.value;
-    setAccount(newAccount);
+    const newdata = { ...data };
+    newdata[input.id] = input.value;
+    setdata(newdata);
   };
 
   return (
@@ -97,7 +102,7 @@ const LoginForm = () => {
         <div className="form-group">
           <label htmlFor="username">Username</label>
           <input
-            value={account.username}
+            value={data.username}
             onChange={handleChange}
             type="text"
             className="form-control"
@@ -110,7 +115,7 @@ const LoginForm = () => {
             type="text"
             className="form-control"
             id="password"
-            value={account.password}
+            value={data.password}
             onChange={handleChange}
           />
         </div>
