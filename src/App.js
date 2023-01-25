@@ -11,6 +11,7 @@ import Rentals from './components/rentals';
 import NotFound from './components/notFound';
 import MovieForm from './components/movieForm';
 import LoginForm from './components/login';
+import Register from './components/register';
 import './App.css';
 
 const router = createBrowserRouter(
@@ -19,6 +20,7 @@ const router = createBrowserRouter(
       <Route path="customers" element={<Customers />} />
       <Route path="rentals" element={<Rentals />} />
       <Route path="login" element={<LoginForm />} />
+      <Route path="register" element={<Register />} />
       <Route path=":id" element={<MovieForm />} />
       <Route index element={<Movies />} />
 
