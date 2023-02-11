@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+import { Navigate } from 'react-router-dom';
 import Pagination from './common/pagination';
 import { getMovies } from '../services/fakeMovieService';
 import { paginate } from './utils/paginate';
@@ -14,12 +15,17 @@ class Movies extends Component {
     pageSize: 4,
     currentPage: 1,
     sortColumn: { path: 'title', order: 'asc' },
+    navigate: false,
   };
 
   componentDidMount() {
     const genres = [{ _id: '', name: 'All Genres' }, ...getGenres()];
     this.setState({ movies: getMovies(), genres });
   }
+
+  handleNavigate = () => {
+    this.setState({ navigate: true });
+  };
 
   handleDelete = (id) => {
     const movies = this.state.movies.filter((movie) => movie._id !== id);
@@ -69,7 +75,8 @@ class Movies extends Component {
 
   render() {
     const { length: count } = this.state.movies;
-    const { currentPage, pageSize, sortColumn } = this.state;
+    const { currentPage, pageSize, sortColumn, navigate } = this.state;
+    if (navigate) return <Navigate to="new" />;
 
     if (count === 0) return <p>There are no movies in the database.</p>;
 
@@ -85,8 +92,13 @@ class Movies extends Component {
           />
         </div>
         <div className="col">
+          <button
+            className="btn btn-primary mb-2"
+            onClick={this.handleNavigate}
+          >
+            New Movie
+          </button>
           <p>Showing {totalCount} movies in the database.</p>
-
           <MoviesTable
             movies={movies}
             sortColumn={sortColumn}

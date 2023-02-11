@@ -21,7 +21,7 @@ const router = createBrowserRouter(
       <Route path="rentals" element={<Rentals />} />
       <Route path="login" element={<LoginForm />} />
       <Route path="register" element={<RegisterForm />} />
-      <Route path=":id" element={<MovieForm />} />
+      <Route path="new" element={<MovieForm />} />
       <Route index element={<Movies />} />
 
       <Route path="*" element={<NotFound />} />
