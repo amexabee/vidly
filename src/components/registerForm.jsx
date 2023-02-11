@@ -1,7 +1,7 @@
 import Joi from 'joi-browser';
 import Form from './common/form';
 
-class Register extends Form {
+class RegisterForm extends Form {
   state = { data: { username: '', password: '', name: '' }, errors: {} };
 
   schema = {
@@ -30,4 +30,4 @@ class Register extends Form {
   }
 }
 
-export default Register;
+export default RegisterForm;
