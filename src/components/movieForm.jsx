@@ -1,14 +1,9 @@
-import { Navigate } from 'react-router-dom';
 import Joi from 'joi-browser';
 import Form from './common/form';
 class MovieForm extends Form {
   state = {
     data: { title: '', number: '', rate: '' },
     errors: {},
-    navigate: false,
-  };
-  handleNavigate = () => {
-    this.setState({ navigate: true });
   };
 
   schema = {
@@ -18,7 +13,6 @@ class MovieForm extends Form {
   };
 
   render() {
-    if (this.state.navigate) return <Navigate to="/" replace={true} />;
     return (
       <div>
         <h1>Movie Form</h1>
