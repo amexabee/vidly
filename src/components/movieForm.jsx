@@ -25,7 +25,7 @@ class MovieForm extends Form {
         <form onSubmit={this.handleSubmit}>
           {this.renderInput('title', 'Title')}
           <>
-            <label className="mt-2">Genre</label>
+            <label>Genre</label>
             <select className="form-select mb-2">
               <option selected></option>
               <option value="Action">Action</option>
