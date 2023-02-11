@@ -1,25 +1,9 @@
-// import { useState } from 'react';
 import { Navigate } from 'react-router-dom';
+import Joi from 'joi-browser';
 import Form from './common/form';
-
-// const MovieForm = () => {
-//   // const { id } = useParams();
-//   const [navigate, setNavigate] = useState(false);
-//   if (navigate) return <Navigate to="/" replace={true} />;
-
-//   return (
-//     <div>
-//       <h1>Movie Form</h1>
-//       <button className="btn btn-primary" onClick={() => setNavigate(true)}>
-//         Save
-//       </button>
-//     </div>
-//   );
-// };
-
 class MovieForm extends Form {
   state = {
-    data: { username: '', password: '', name: '' },
+    data: { title: '', number: '', rate: '' },
     errors: {},
     navigate: false,
   };
@@ -27,14 +11,32 @@ class MovieForm extends Form {
     this.setState({ navigate: true });
   };
 
+  schema = {
+    title: Joi.string().required().label('Title'),
+    number: Joi.number().integer().min(0).max(100).label('Number in Stock'),
+    rate: Joi.number().precision(10).min(0).max(10).label('Daily Rental Rate'),
+  };
+
   render() {
     if (this.state.navigate) return <Navigate to="/" replace={true} />;
     return (
       <div>
         <h1>Movie Form</h1>
-        <button className="btn btn-primary" onClick={this.handleNavigate}>
-          Save
-        </button>
+        <form onSubmit={this.handleSubmit}>
+          {this.renderInput('title', 'Title')}
+          <>
+            <label className="mt-2">Genre</label>
+            <select className="form-select mb-2">
+              <option selected></option>
+              <option value="Action">Action</option>
+              <option value="Comedy">Comedy</option>
+              <option value="Thriller">Thriller</option>
+            </select>
+          </>
+          {this.renderInput('number', 'Number in Stock', 'number')}
+          {this.renderInput('rate', 'Rate')}
+          {this.renderButton('Save')}
+        </form>
       </div>
     );
   }
