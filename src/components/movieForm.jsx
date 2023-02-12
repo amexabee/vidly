@@ -1,7 +1,8 @@
 import Joi from 'joi-browser';
-import { getGenres } from '../services/fakeGenreService';
 import Form from './common/form';
-import { useParams } from 'react-router-dom';
+import { useParams, Navigate } from 'react-router-dom';
+import { getMovie, saveMovie } from './../services/fakeMovieService';
+import { getGenres } from '../services/fakeGenreService';
 class MovieForm extends Form {
   state = {
     data: { title: '', genreId: '', numberInStock: '', dailyRentalRate: '' },
@@ -18,11 +19,33 @@ class MovieForm extends Form {
   };
 
   componentDidMount() {
-    const id = this.props.params.id;
-    console.log(id);
     const genres = getGenres();
     this.setState({ genres });
+
+    const movieId = this.props.params.id;
+    if (movieId === 'new') return;
+
+    const movie = getMovie(movieId);
+    if (!movie) return <Navigate to="*" replace={true} />;
+
+    this.setState({ data: this.mapToViewModel(movie) });
   }
+
+  mapToViewModel(movie) {
+    return {
+      _id: movie._id,
+      title: movie.title,
+      genreId: movie.genre._id,
+      numberInStock: movie.numberInStock,
+      dailyRentalRate: movie.dailyRentalRate,
+    };
+  }
+
+  doSubmit = () => {
+    saveMovie(this.state.data);
+
+    <Navigate to="/" />;
+  };
 
   render() {
     return (
@@ -30,15 +53,7 @@ class MovieForm extends Form {
         <h1>Movie Form</h1>
         <form onSubmit={this.handleSubmit}>
           {this.renderInput('title', 'Title')}
-          <>
-            <label>Genre</label>
-            <select className="form-select mb-2">
-              <option style={{ display: 'none' }} />
-              <option value="Action">Action</option>
-              <option value="Comedy">Comedy</option>
-              <option value="Thriller">Thriller</option>
-            </select>
-          </>
+          {this.renderSelect('genreId', 'Genre', this.state.genres)}
           {this.renderInput('number', 'Number in Stock', 'number')}
           {this.renderInput('rate', 'Rate')}
           {this.renderButton('Save')}
