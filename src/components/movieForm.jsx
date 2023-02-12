@@ -1,6 +1,6 @@
 import Joi from 'joi-browser';
 import Form from './common/form';
-import { useParams, Navigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { getMovie, saveMovie } from './../services/fakeMovieService';
 import { getGenres } from '../services/fakeGenreService';
 class MovieForm extends Form {
@@ -14,8 +14,18 @@ class MovieForm extends Form {
     _id: Joi.string(),
     title: Joi.string().required().label('Title'),
     genreId: Joi.string().required().label('Title'),
-    number: Joi.number().integer().min(0).max(100).label('Number in Stock'),
-    rate: Joi.number().precision(10).min(0).max(10).label('Daily Rental Rate'),
+    numberInStock: Joi.number()
+      .required()
+      .integer()
+      .min(0)
+      .max(100)
+      .label('Number in Stock'),
+    dailyRentalRate: Joi.number()
+      .required()
+      .precision(10)
+      .min(0)
+      .max(10)
+      .label('Daily Rental Rate'),
   };
 
   componentDidMount() {
@@ -26,7 +36,7 @@ class MovieForm extends Form {
     if (movieId === 'new') return;
 
     const movie = getMovie(movieId);
-    if (!movie) return <Navigate to="*" replace={true} />;
+    if (!movie) return this.props.navigate('not_found');
 
     this.setState({ data: this.mapToViewModel(movie) });
   }
@@ -44,7 +54,7 @@ class MovieForm extends Form {
   doSubmit = () => {
     saveMovie(this.state.data);
 
-    <Navigate to="/" />;
+    this.props.navigate('/');
   };
 
   render() {
@@ -54,8 +64,8 @@ class MovieForm extends Form {
         <form onSubmit={this.handleSubmit}>
           {this.renderInput('title', 'Title')}
           {this.renderSelect('genreId', 'Genre', this.state.genres)}
-          {this.renderInput('number', 'Number in Stock', 'number')}
-          {this.renderInput('rate', 'Rate')}
+          {this.renderInput('numberInStock', 'Number in Stock', 'number')}
+          {this.renderInput('dailyRentalRate', 'Rate')}
           {this.renderButton('Save')}
         </form>
       </div>
@@ -63,5 +73,7 @@ class MovieForm extends Form {
   }
 }
 
-const Hello = (props) => <MovieForm {...props} params={useParams()} />;
+const Hello = (props) => (
+  <MovieForm {...props} params={useParams()} navigate={useNavigate()} />
+);
 export default Hello;
