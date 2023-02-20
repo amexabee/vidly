@@ -5,12 +5,12 @@ const ListGroup = (props) => {
     <ul className="list-group">
       {items.map((item) => (
         <li
+          key={item[valueProperty]}
           className={
             selectedGenre === item
               ? 'list-group-item active'
               : 'list-group-item'
           }
-          key={item[valueProperty]}
           onClick={() => onItemSelect(item)}
         >
           {item[textProperty]}

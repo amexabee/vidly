@@ -28,7 +28,8 @@
   color: #61dafb;
 }
 
-.list-group {
+.list-group,
+th {
   cursor: pointer;
 }
 
