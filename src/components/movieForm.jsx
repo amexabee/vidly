@@ -1,21 +1,79 @@
+import Joi from 'joi-browser';
 import { useNavigate, useParams } from 'react-router-dom';
+import { getGenres } from '../services/fakeGenreService';
+import { getMovie, saveMovie } from '../services/fakeMovieService';
+import Form from './common/form';
 
-const MovieForm = () => {
-  const { id } = useParams();
-  const navigate = useNavigate();
-
-  const handleClick = () => {
-    navigate('/');
+class MovieForm extends Form {
+  state = {
+    data: { title: '', genreId: '', numberInStock: '', dailyRentalRate: '' },
+    genres: [],
+    errors: {},
   };
 
-  return (
-    <div>
-      <h1>Movie Form - {id}</h1>
-      <button className="btn btn-primary" onClick={handleClick}>
-        Save
-      </button>
-    </div>
-  );
-};
+  schema = {
+    _id: Joi.string(),
+    title: Joi.string().required().label('Title'),
+    genreId: Joi.string().required().label('Genre'),
+    numberInStock: Joi.number()
+      .required()
+      .integer()
+      .min(0)
+      .max(100)
+      .label('Number in Stock'),
+    dailyRentalRate: Joi.number()
+      .required()
+      .precision(10)
+      .min(0)
+      .max(10)
+      .label('Daily Rental Rate'),
+  };
 
-export default MovieForm;
+  componentDidMount = () => {
+    const genres = getGenres();
+    this.setState({ genres });
+
+    const movieId = this.props.params.id;
+    if (movieId === 'new') return;
+
+    const movie = getMovie(movieId);
+    if (!movie) return this.props.navigate('not_found');
+
+    this.setState({ data: this.mapToViewModel(movie) });
+  };
+
+  mapToViewModel(movie) {
+    return {
+      _id: movie._id,
+      title: movie.title,
+      genreId: movie.genre._id,
+      numberInStock: movie.numberInStock,
+      dailyRentalRate: movie.dailyRentalRate,
+    };
+  }
+
+  doSubmit = () => {
+    saveMovie(this.state.data);
+    this.props.navigate('/');
+  };
+
+  render() {
+    return (
+      <div>
+        <h1>Movie Form</h1>
+        <form onSubmit={this.handleSubmit}>
+          {this.renderInput('title', 'Title')}
+          {this.renderSelect('genreId', 'Genre', this.state.genres)}
+          {this.renderInput('numberInStock', 'Number in Stock', 'number')}
+          {this.renderInput('dailyRentalRate', 'Rate')}
+          {this.renderButton('Save')}
+        </form>
+      </div>
+    );
+  }
+}
+
+const Hello = (props) => (
+  <MovieForm {...props} params={useParams()} navigate={useNavigate()} />
+);
+export default Hello;

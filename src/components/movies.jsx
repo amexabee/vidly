@@ -6,13 +6,17 @@ import { paginate } from './utils/paginate';
 import ListGroup from './common/listGroup';
 import MoviesTable from './moviesTable';
 import _ from 'lodash';
+import { Link } from 'react-router-dom';
+import SearchBox from './searchBox';
 
 class Movies extends Component {
   state = {
     movies: [],
     genres: [],
-    pageSize: 4,
     currentPage: 1,
+    pageSize: 4,
+    searchQuery: '',
+    selectedGenre: null,
     sortColumn: { path: 'title', order: 'asc' },
   };
 
@@ -39,7 +43,11 @@ class Movies extends Component {
   };
 
   handleGenreSelect = (genre) => {
-    this.setState({ selectedGenre: genre, currentPage: 1 });
+    this.setState({ selectedGenre: genre, searchQuery: '', currentPage: 1 });
+  };
+
+  handleSearch = (query) => {
+    this.setState({ searchQuery: query, selectedGenre: null, currentPage: 1 });
   };
 
   handleSort = (sortColumn) => {
@@ -50,20 +58,29 @@ class Movies extends Component {
     const {
       currentPage,
       pageSize,
-      movies: allMovies,
       genres,
-      selectedGenre,
       sortColumn,
+      selectedGenre,
+      searchQuery,
+      movies: allMovies,
     } = this.state;
 
     if (!allMovies.length) return <p>There are no movies in the database.</p>;
 
-    const filtered =
-      selectedGenre && selectedGenre._id
-        ? allMovies.filter((movie) => movie.genre._id === selectedGenre._id)
-        : allMovies;
+    const filtered = searchQuery
+      ? allMovies.filter((movie) =>
+          movie.title.toLowerCase().startsWith(searchQuery.toLowerCase())
+        )
+      : selectedGenre && selectedGenre._id
+      ? allMovies.filter((movie) => movie.genre._id === selectedGenre._id)
+      : allMovies;
 
-    const sorted = _.orderBy(filtered, [sortColumn.path], [sortColumn.order]);
+    let sortingKey = sortColumn.path;
+    if (sortColumn.path === 'title') {
+      sortingKey = (x) => x[sortColumn.path].toLowerCase();
+    }
+
+    const sorted = _.orderBy(filtered, [sortingKey], [sortColumn.order]);
 
     const movies = paginate(sorted, currentPage, pageSize);
 
@@ -78,7 +95,11 @@ class Movies extends Component {
         </div>
 
         <div className="col">
+          <Link to="new" className="btn btn-primary mb-2">
+            New Movie
+          </Link>
           <p>Showing {filtered.length} movies in the database.</p>
+          <SearchBox value={searchQuery} onChange={this.handleSearch} />
           <MoviesTable
             movies={movies}
             onLike={this.handleLike}
